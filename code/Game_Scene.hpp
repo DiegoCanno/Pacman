@@ -126,6 +126,8 @@
             Sprite       * right_button;
             Sprite       * down_button;
             Sprite       * pacman;
+            Sprite       * phantom;
+
             float posX = canvas_width/2;
             float posY = canvas_height/2;
 
@@ -134,10 +136,10 @@
             float final_x;
             float final_y;
 
-            bool moving_right;
-            bool moving_left;
-            bool moving_up;
-            bool moving_down;
+            //bool moving_right;
+            //bool moving_left;
+            //bool moving_up;
+            //bool moving_down;
 
 
             bool           follow_target;                       ///< true si el usuario está tocando la pantalla y su player ir hacia donde toca.
@@ -260,6 +262,8 @@
             //prueba
             int Move_User(const Point2f & point);
             int option_at (const Point2f & point);
+
+            void check_collision();
             void update_pacman();
             void button_config();
 

@@ -37,7 +37,8 @@ namespace example
         { ID(down),       "button/abajo.png"              },
         { ID(left),       "button/izquierda.png"          },
         { ID(right),       "button/derecha.png"           },
-        { ID(pacman),       "Character/pacman.png"           },
+        { ID(pacman),       "Character/pacman.png"        },
+        { ID(phantom),       "Character/phantom.png"      },
 
     };
 
@@ -137,24 +138,24 @@ namespace example
                     final_point = {final_x,final_y};
                     if (up_button->contains(final_point))
                     {
-                        pacman->set_speed_y(20);
+                        pacman->set_speed_y(50);
                         pacman->set_speed_x(0);
                     }
                     else if (down_button->contains(final_point))
                     {
-                        pacman->set_speed_y(-20);
+                        pacman->set_speed_y(-50);
                         pacman->set_speed_x(0);
 
 
                     }
                     else if (left_button->contains(final_point))
                     {
-                        pacman->set_speed_x(-20);
+                        pacman->set_speed_x(-50);
                         pacman->set_speed_y(0);
                     }
                     else if (right_button->contains(final_point))
                     {
-                        pacman->set_speed_x(20);
+                        pacman->set_speed_x(50);
                         pacman->set_speed_y(0);
                     }
                 
@@ -298,6 +299,8 @@ namespace example
 
         Sprite_Handle pacman_sprite(new Sprite(textures[ID(pacman)].get()));
 
+        Sprite_Handle phantom_sprite(new Sprite(textures[ID(phantom)].get()));
+
         sprites.push_back (up_button_sprite);
         sprites.push_back (down_button_sprite);
         sprites.push_back (left_button_sprite);
@@ -305,6 +308,9 @@ namespace example
 
         sprites.push_back(pacman_sprite);
         pacman_sprite->set_scale(0.1);
+
+        sprites.push_back(phantom_sprite);
+        phantom_sprite->set_scale(0.1);
 
         up_button_sprite->set_scale(0.2);
         down_button_sprite->set_scale(0.2);
@@ -319,7 +325,9 @@ namespace example
         left_player   =  left_player_handle.get ();
         right_player  = right_player_handle.get ();
         ball          =         ball_handle.get ();
+
         pacman        = pacman_sprite.get();
+        phantom       = phantom_sprite.get();
 
         //prueba
         up_button = up_button_sprite.get();
@@ -342,6 +350,9 @@ namespace example
 
         //posicion del bueno de pacman
         pacman->set_position({(canvas_width/2),canvas_height/2});
+
+        //posicion phantom
+        phantom->set_position({(canvas_width/2)+40,canvas_height/2});
 
          left_player->set_position ({ left_player->get_width () * 3.f, canvas_height / 2.f });
          left_player->set_speed_y  (0.f);
@@ -398,6 +409,7 @@ namespace example
         // Se comprueban las posibles colisiones de la bola con los bordes y con los players:
 
         check_ball_collisions ();
+        check_collision();
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -494,37 +506,45 @@ namespace example
             right_player->set_speed_y (0);
             right_player->set_speed_x (0);
     }
-    void Game_Scene::update_pacman ()
-    {
 
-        if (moving_up)
-        {
-
-            pacman->set_position({posX, posY+20});
-        }
-        else if (moving_down == true)
-        {
-            pacman->set_speed_y(-100);
-        }
-        else if (moving_left == true)
-        {
-            pacman->set_speed_x(-100);
-        }
-        else if (moving_down == true)
-        {
-            pacman->set_speed_x(100);
-        }
-
-
-        else
-            pacman->set_speed_x(0);
-            pacman->set_speed_y(0);
-            right_player->set_speed_y (0);
-        right_player->set_speed_x (0);
-    }
 
     // ---------------------------------------------------------------------------------------------
+    void Game_Scene::check_collision() {
 
+        if(pacman->intersects(*bottom_border)){
+
+
+            pacman->is_not_visible();
+
+
+        }
+        if (gameplay != BALL_LEAVING)
+        {
+            if (pacman->intersects(*bottom_border))
+            {
+
+                    gameplay = BALL_LEAVING;
+            }
+            if (pacman->intersects(*bottom_border))
+            {
+
+                gameplay = BALL_LEAVING;
+            }
+            if (pacman->intersects(*bottom_border))
+            {
+
+                gameplay = BALL_LEAVING;
+            }
+
+
+        }
+
+
+
+
+
+
+    }
     void Game_Scene::check_ball_collisions ()
     {
         // Se comprueba si la bola choca con el borde superior o con el inferior, en cuyo caso se

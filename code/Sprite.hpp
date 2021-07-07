@@ -68,6 +68,7 @@ namespace example
         const float    & get_speed_x    () const { return  speed[0];    }
         const float    & get_speed_y    () const { return  speed[1];    }
 
+
         float get_left_x () const
         {
             return

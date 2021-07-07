@@ -39,6 +39,8 @@ namespace example
         { ID(right),       "button/derecha.png"           },
         { ID(pacman),       "Character/pacman.png"        },
         { ID(phantom),       "Character/phantom.png"      },
+        { ID(wall),                   "Character/wall.png"},
+        { ID(coin),                   "Character/pelota.png"},
 
     };
 
@@ -138,27 +140,27 @@ namespace example
                     final_point = {final_x,final_y};
                     if (up_button->contains(final_point))
                     {
-                        pacman->set_speed_y(50);
+                        pacman->set_speed_y(200);
                         pacman->set_speed_x(0);
                     }
                     else if (down_button->contains(final_point))
                     {
-                        pacman->set_speed_y(-50);
+                        pacman->set_speed_y(-200);
                         pacman->set_speed_x(0);
 
 
                     }
                     else if (left_button->contains(final_point))
                     {
-                        pacman->set_speed_x(-50);
+                        pacman->set_speed_x(-200);
                         pacman->set_speed_y(0);
                     }
                     else if (right_button->contains(final_point))
                     {
-                        pacman->set_speed_x(50);
+                        pacman->set_speed_x(200);
                         pacman->set_speed_y(0);
                     }
-                
+
 
                     //follow_target = false;
                     break;
@@ -301,6 +303,10 @@ namespace example
 
         Sprite_Handle phantom_sprite(new Sprite(textures[ID(phantom)].get()));
 
+        Sprite_Handle wall_sprite(new Sprite(textures[ID(wall)].get()));
+
+        Sprite_Handle coin_sprite(new Sprite(textures[ID(coin)].get()));
+
         sprites.push_back (up_button_sprite);
         sprites.push_back (down_button_sprite);
         sprites.push_back (left_button_sprite);
@@ -311,6 +317,12 @@ namespace example
 
         sprites.push_back(phantom_sprite);
         phantom_sprite->set_scale(0.1);
+
+        sprites.push_back(wall_sprite);
+        wall_sprite->set_scale(0.05);
+
+        sprites.push_back(coin_sprite);
+        wall_sprite->set_scale(0.1);
 
         up_button_sprite->set_scale(0.2);
         down_button_sprite->set_scale(0.2);
@@ -328,6 +340,8 @@ namespace example
 
         pacman        = pacman_sprite.get();
         phantom       = phantom_sprite.get();
+        wall          = wall_sprite.get();
+        coin          = coin_sprite.get();
 
         //prueba
         up_button = up_button_sprite.get();
@@ -348,11 +362,7 @@ namespace example
         left_button->set_position({(canvas_width/2)-100,canvas_height/6});
         right_button->set_position({(canvas_width/2)+100,canvas_height/6});
 
-        //posicion del bueno de pacman
-        pacman->set_position({(canvas_width/2),canvas_height/2});
 
-        //posicion phantom
-        phantom->set_position({(canvas_width/2)+40,canvas_height/2});
 
          left_player->set_position ({ left_player->get_width () * 3.f, canvas_height / 2.f });
          left_player->set_speed_y  (0.f);
@@ -364,6 +374,17 @@ namespace example
 
 
 
+        //posicion del bueno de pacman
+        pacman->set_position({(canvas_width/2),canvas_height/2});
+
+        //posicion phantom
+        phantom->set_position({(canvas_width/2)+40,canvas_height/2});
+
+        //posicion del wall del que en el futuro haremos mas cositas
+        wall->set_position({(canvas_width/2)+300,canvas_height/2});
+
+        //posicion de la coin del que en el futuro haremos mas cositas
+        coin->set_position({(canvas_width/2)-300,canvas_height/2});
 
         follow_target = false;
 
@@ -511,36 +532,51 @@ namespace example
     // ---------------------------------------------------------------------------------------------
     void Game_Scene::check_collision() {
 
-        if(pacman->intersects(*bottom_border)){
+        if(pacman->intersects(*phantom)){
 
 
-            pacman->is_not_visible();
-
-
-        }
-        if (gameplay != BALL_LEAVING)
-        {
-            if (pacman->intersects(*bottom_border))
-            {
-
-                    gameplay = BALL_LEAVING;
-            }
-            if (pacman->intersects(*bottom_border))
-            {
-
-                gameplay = BALL_LEAVING;
-            }
-            if (pacman->intersects(*bottom_border))
-            {
-
-                gameplay = BALL_LEAVING;
-            }
+            pacman->set_position_x(canvas_width/2);
+            pacman->set_position_y(canvas_height/2);
 
 
         }
+        if(pacman->intersects(*coin)){
 
 
 
+
+
+        }
+        if(pacman->intersects(*wall)){
+
+            if(wall->get_position_x() == pacman->get_position_x()){
+
+                pacman->set_speed_x(0);
+
+
+            }
+            else if(wall->get_bottom_y()==pacman->get_top_y()){
+
+                pacman->set_speed_y(0);
+
+
+            }
+            else if(wall->get_right_x() == pacman->get_left_x()){
+
+                pacman->set_speed_x(0);
+
+
+            }
+            else if(wall->get_top_y()==pacman->get_bottom_y()){
+
+                pacman->set_speed_y(0);
+
+
+            }
+
+
+
+        }
 
 
 
@@ -636,6 +672,7 @@ namespace example
 
 
     }
+
 
 
 

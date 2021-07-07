@@ -118,7 +118,7 @@
             Sprite       * left_player;                         ///< Puntero al sprite de la lista de sprites que representa al jugador izquierdo.
             Sprite       * right_player;                        ///< Puntero al sprite de la lista de sprites que representa al jugador derecho.
             Sprite       * ball;                                ///< Puntero al sprite de la lista de sprites que representa a la bola.
-
+            Sprite       * pelota;
 
             //prueba
             Sprite       * up_button;
@@ -127,6 +127,8 @@
             Sprite       * down_button;
             Sprite       * pacman;
             Sprite       * phantom;
+            Sprite       * wall;
+            Sprite       * coin;
 
             float posX = canvas_width/2;
             float posY = canvas_height/2;
@@ -165,6 +167,9 @@
             {
                 return { canvas_width, canvas_height };
             }
+
+
+
 
             /**
              * Aquí se inicializan los atributos que deben restablecerse cada vez que se inicia la escena.

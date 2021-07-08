@@ -135,7 +135,7 @@
             unsigned            posXTablero = -25;         ///< Anchura para colocar en horizontal el tablero.
             const unsigned      posYTablero =  -15;         ///< Altura para colocar en vertical el tablero
             const unsigned      escalar     = 1216 * 0.05;         ///< Distancia entre casillas
-            Sprite              *casillasSpr[22*12];       ///< Guarda punteros a los sprites de las casillas
+            Sprite              *walls[265];       ///< Guarda punteros a los sprites de las casillas
 
             int  casillatrue;
             int RandomNumber;

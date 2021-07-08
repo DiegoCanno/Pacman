@@ -356,7 +356,6 @@ namespace example
 
         pacman        = pacman_sprite.get();
         phantom       = phantom_sprite.get();
-        wall          = wall_sprite.get();
         coin          = coin_sprite.get();
         special_coin  = special_coin_sprite.get();
 
@@ -379,21 +378,18 @@ namespace example
         left_button->set_position({(canvas_width/2)-100,canvas_height/6});
         right_button->set_position({(canvas_width/2)+100,canvas_height/6});
 
-        up_button->hide();
-        down_button->hide();
-        left_button->hide();
-        right_button->hide();
+
 
 
 
         //posicion del bueno de pacman
-        pacman->set_position({(canvas_width/2),canvas_height/2});
+        pacman->set_position({(canvas_width/2),(canvas_height/2)-100});
 
         //posicion phantom
         phantom->set_position({(canvas_width/2)+40,canvas_height/2});
 
         //posicion del wall del que en el futuro haremos mas cositas
-        wall->set_position({(canvas_width/2)+300,canvas_height/2});
+        //wall->set_position({(canvas_width/2)+300,canvas_height/2});
 
         //posicion de la coin del que en el futuro haremos mas cositas
         coin->set_position({(canvas_width/2)-300,canvas_height/2});
@@ -443,7 +439,7 @@ namespace example
         //update_user ();
 
         //update_pacman();
-        phantom_ia();
+        //phantom_ia();
 
         // Se comprueban las posibles colisiones de la bola con los bordes y con los players:
 
@@ -502,76 +498,80 @@ namespace example
         }
     }
     void Game_Scene::phantom_ia (){
-        if(phantom->intersects(*wall)){
-            if(phantom->intersects(*wall) && phantom->get_speed_y() !=0 )
-            {
-                if(phantom->get_speed_y()<0)
+        for(int i=0;i<266;++i){
+            if(phantom->intersects(*walls[i])){
+                if(phantom->intersects(*walls[i]) && phantom->get_speed_y() !=0 )
                 {
-                    phantom->set_position_y(phantom->get_position_y()+5.f);
-                    phantom->set_speed_y(0);
-                    RandomNumber = random() % 3+1;
+                    if(phantom->get_speed_y()<0)
+                    {
+                        phantom->set_position_y(phantom->get_position_y()+5.f);
+                        phantom->set_speed_y(0);
+                        RandomNumber = random() % 3+1;
 
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(200);
+                        if(RandomNumber==1){
+                            phantom->set_speed_x(200);
+                        }
+                        else if(RandomNumber==2){
+                            phantom->set_speed_y(200);
+                        }
+                        else if (RandomNumber==3){
+                            phantom->set_speed_x(-200);
+                        }
                     }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(200);
-                    }
-                    else if (RandomNumber==3){
-                        phantom->set_speed_x(-200);
+                    if( phantom->get_speed_y()>0)
+                    {
+                        phantom->set_position_y(phantom->get_position_y()-5.f);
+                        RandomNumber = random() % 3+1;
+                        phantom->set_speed_y(0);
+
+
+                        if(RandomNumber==1){
+                            phantom->set_speed_x(200);
+                        }
+                        else if(RandomNumber==2){
+                            phantom->set_speed_y(-200);
+                        }
+                        else if(RandomNumber==3){
+                            phantom->set_speed_x(-200);
+                        }
                     }
                 }
-                if( phantom->get_speed_y()>0)
-                {
-                    phantom->set_position_y(phantom->get_position_y()-5.f);
-                    RandomNumber = random() % 3+1;
-                    phantom->set_speed_y(0);
+                else if(phantom->intersects(*walls[i]) && phantom->get_speed_x()!=0){
 
+                    if(phantom->get_speed_x()<0){
+                        phantom->set_position_x(phantom->get_position_x()+5.f);
+                        RandomNumber = random() % 3+1;
+                        phantom->set_speed_x(0);
+                        if(RandomNumber==1){
+                            phantom->set_speed_x(200);
+                        }
+                        else if(RandomNumber==2){
+                            phantom->set_speed_y(-200);
+                        }
+                        else if(RandomNumber==3){
+                            phantom->set_speed_y(200);
+                        }
+                    }
+                    else if(phantom->get_speed_x()>0){
 
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(200);
-                    }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(-200);
-                    }
-                    else if(RandomNumber==3){
-                        phantom->set_speed_x(-200);
+                        phantom->set_position_x(phantom->get_position_x()-5.f);
+                        RandomNumber = random() % 3+1;
+                        phantom->set_speed_x(0);
+
+                        if(RandomNumber==1){
+                            phantom->set_speed_x(-200);
+                        }
+                        else if(RandomNumber==2){
+                            phantom->set_speed_y(-200);
+                        }
+                        else if(RandomNumber==3){
+                            phantom->set_speed_y(200);
+                        }
                     }
                 }
             }
-            else if(phantom->intersects(*wall) && phantom->get_speed_x()!=0){
 
-                if(phantom->get_speed_x()<0){
-                    phantom->set_position_x(phantom->get_position_x()+5.f);
-                    RandomNumber = random() % 3+1;
-                    phantom->set_speed_x(0);
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(200);
-                    }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(-200);
-                    }
-                    else if(RandomNumber==3){
-                        phantom->set_speed_y(200);
-                    }
-                }
-                else if(phantom->get_speed_x()>0){
 
-                    phantom->set_position_x(phantom->get_position_x()-5.f);
-                    RandomNumber = random() % 3+1;
-                    phantom->set_speed_x(0);
-
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(-200);
-                    }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(-200);
-                    }
-                    else if(RandomNumber==3){
-                        phantom->set_speed_y(200);
-                    }
-                }
-            }
         }
     }
 
@@ -655,27 +655,87 @@ namespace example
 
 
         }
-        if(pacman->intersects(*wall) && pacman->get_speed_y() !=0 )
-        {
-            if(pacman->get_speed_y()<0)
+        for(int i = 0;i<266;++i){
+            if(pacman->intersects(*walls[i]) && pacman->get_speed_y() !=0 )
             {
-                pacman->set_position_y(pacman->get_position_y()+5.f);
-                pacman->set_speed_y(0);
+                if(pacman->get_speed_y()<0)
+                {
+                    pacman->set_position_y(pacman->get_position_y()+5.f);
+                    pacman->set_speed_y(0);
+                }
+                if( pacman->get_speed_y()>0)
+                {
+                    pacman->set_position_y(pacman->get_position_y()-5.f);
+                    pacman->set_speed_y(0);
+                }
             }
-            if( pacman->get_speed_y()>0)
-            {
-                pacman->set_position_y(pacman->get_position_y()-5.f);
-                pacman->set_speed_y(0);
+            else if(pacman->intersects(*walls[i]) && pacman->get_speed_x()!=0){
+                if(pacman->get_speed_x()<0){
+                    pacman->set_position_x(pacman->get_position_x()+5.f);
+                    pacman->set_speed_x(0);
+                }
+                else if(pacman->get_speed_x()>0){
+                    pacman->set_position_x(pacman->get_position_x()-5.f);
+                    pacman->set_speed_x(0);
+                }
             }
-        }
-        else if(pacman->intersects(*wall) && pacman->get_speed_x()!=0){
-            if(pacman->get_speed_x()<0){
-                pacman->set_position_x(pacman->get_position_x()+5.f);
-                pacman->set_speed_x(0);
-            }
-            else if(pacman->get_speed_x()>0){
-                pacman->set_position_x(pacman->get_position_x()-5.f);
-                pacman->set_speed_x(0);
+            if(phantom->intersects(*walls[i])) {
+                if (phantom->intersects(*walls[i]) && phantom->get_speed_y() != 0) {
+                    if (phantom->get_speed_y() < 0) {
+                        phantom->set_position_y(phantom->get_position_y() + 5.f);
+                        phantom->set_speed_y(0);
+                        RandomNumber = random() % 3 + 1;
+
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_x(-200);
+                        }
+                    }
+                    if (phantom->get_speed_y() > 0) {
+                        phantom->set_position_y(phantom->get_position_y() - 5.f);
+                        RandomNumber = random() % 3 + 1;
+                        phantom->set_speed_y(0);
+
+
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(-200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_x(-200);
+                        }
+                    }
+                } else if (phantom->intersects(*walls[i]) && phantom->get_speed_x() != 0) {
+
+                    if (phantom->get_speed_x() < 0) {
+                        phantom->set_position_x(phantom->get_position_x() + 5.f);
+                        RandomNumber = random() % 3 + 1;
+                        phantom->set_speed_x(0);
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(-200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_y(200);
+                        }
+                    } else if (phantom->get_speed_x() > 0) {
+
+                        phantom->set_position_x(phantom->get_position_x() - 5.f);
+                        RandomNumber = random() % 3 + 1;
+                        phantom->set_speed_x(0);
+
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(-200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(-200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_y(200);
+                        }
+                    }
+                }
             }
         }
 
@@ -797,7 +857,7 @@ namespace example
 
                 casillaMap->set_position({x, y});
                 casillaMap->set_scale(0.05);
-                casillasSpr[i] = casillaMap.get();
+                walls[i] = casillaMap.get();
                 sprites.push_back(casillaMap);
             }
 

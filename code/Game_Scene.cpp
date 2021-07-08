@@ -329,6 +329,8 @@ namespace example
         left_button_sprite->set_scale(0.2);
         right_button_sprite->set_scale(0.2);
 
+        coin_sprite->set_scale(0.1);
+
 
         // Se guardan punteros a los sprites que se van a usar frecuentemente:
 
@@ -364,13 +366,6 @@ namespace example
 
 
 
-         left_player->set_position ({ left_player->get_width () * 3.f, canvas_height / 2.f });
-         left_player->set_speed_y  (0.f);
-        right_player->set_position ({ canvas_width  - right_player->get_width () * 3.f, canvas_height / 2.f });
-        right_player->set_speed_y  (0.f);
-        right_player->set_speed_x  (20.f);
-                ball->set_position ({ canvas_width / 2.f, canvas_height / 2.f });
-                ball->set_speed    ({ 0.f, 0.f });
 
 
 
@@ -407,6 +402,7 @@ namespace example
         // resultante tenga exactamente esa longitud:
 
         ball->set_speed (random_direction.normalized () * ball_speed);
+        phantom->set_speed_x(200);
 
         gameplay = PLAYING;
     }
@@ -426,6 +422,7 @@ namespace example
         //update_user ();
 
         //update_pacman();
+        phantom_ia();
 
         // Se comprueban las posibles colisiones de la bola con los bordes y con los players:
 
@@ -481,6 +478,93 @@ namespace example
                     left_player->set_speed_y (0.f);
             }
         }
+    }
+    void Game_Scene::phantom_ia (){
+
+
+
+        if(phantom->intersects(*wall)){
+
+
+
+            if(phantom->intersects(*wall) && phantom->get_speed_y() !=0 )
+            {
+
+                if(phantom->get_speed_y()<0)
+                {
+                    phantom->set_position_y(phantom->get_position_y()+5.f);
+                    phantom->set_speed_y(0);
+                    RandomNumber = random() % 3+1;
+
+                    if(RandomNumber==1){
+                        phantom->set_speed_x(200);
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(200);
+                    }
+                    else if (RandomNumber==3){
+                        phantom->set_speed_x(-200);
+                    }
+                }
+                if( phantom->get_speed_y()>0)
+                {
+                    phantom->set_position_y(phantom->get_position_y()-5.f);
+                    RandomNumber = random() % 3+1;
+                    phantom->set_speed_y(0);
+
+
+                    if(RandomNumber==1){
+                        phantom->set_speed_x(200);
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+                    else if(RandomNumber==3){
+                        phantom->set_speed_x(-200);
+                    }
+                }
+            }
+            else if(phantom->intersects(*wall) && phantom->get_speed_x()!=0){
+
+                if(phantom->get_speed_x()<0){
+                    phantom->set_position_x(phantom->get_position_x()+5.f);
+                    RandomNumber = random() % 3+1;
+                    phantom->set_speed_x(0);
+                    if(RandomNumber==1){
+                        phantom->set_speed_x(200);
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+                    else if(RandomNumber==3){
+                        phantom->set_speed_y(200);
+                    }
+                }
+                else if(phantom->get_speed_x()>0){
+
+                    phantom->set_position_x(phantom->get_position_x()-5.f);
+                    RandomNumber = random() % 3+1;
+                    phantom->set_speed_x(0);
+
+                    if(RandomNumber==1){
+                        phantom->set_speed_x(-200);
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+                    else if(RandomNumber==3){
+                        phantom->set_speed_y(200);
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -549,38 +633,26 @@ namespace example
         }
         if(pacman->intersects(*wall) && pacman->get_speed_y() !=0 )
         {
-
             if(pacman->get_speed_y()<0)
             {
                 pacman->set_position_y(pacman->get_position_y()+5.f);
                 pacman->set_speed_y(0);
-
-
             }
             if( pacman->get_speed_y()>0)
             {
                 pacman->set_position_y(pacman->get_position_y()-5.f);
                 pacman->set_speed_y(0);
-
             }
         }
         else if(pacman->intersects(*wall) && pacman->get_speed_x()!=0){
-
-
             if(pacman->get_speed_x()<0){
                 pacman->set_position_x(pacman->get_position_x()+5.f);
                 pacman->set_speed_x(0);
-
-
             }
             else if(pacman->get_speed_x()>0){
                 pacman->set_position_x(pacman->get_position_x()-5.f);
                 pacman->set_speed_x(0);
-
             }
-
-
-
         }
 
 

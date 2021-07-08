@@ -130,6 +130,9 @@
             Sprite       * wall;
             Sprite       * coin;
 
+            int RandomNumber;
+            int numeroListo;
+
             float posX = canvas_width/2;
             float posY = canvas_height/2;
 
@@ -268,6 +271,7 @@
             int Move_User(const Point2f & point);
             int option_at (const Point2f & point);
 
+            void phantom_ia();
             void check_collision();
             void update_pacman();
             void button_config();

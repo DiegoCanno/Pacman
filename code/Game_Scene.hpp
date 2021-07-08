@@ -129,9 +129,19 @@
             Sprite       * phantom;
             Sprite       * wall;
             Sprite       * coin;
+            Sprite       * special_coin;
 
+            //printeo mapa
+            unsigned            posXTablero = -25;         ///< Anchura para colocar en horizontal el tablero.
+            const unsigned      posYTablero =  -15;         ///< Altura para colocar en vertical el tablero
+            const unsigned      escalar     = 1216 * 0.05;         ///< Distancia entre casillas
+            Sprite              *casillasSpr[22*12];       ///< Guarda punteros a los sprites de las casillas
+
+            int  casillatrue;
             int RandomNumber;
             int numeroListo;
+
+
 
             float posX = canvas_width/2;
             float posY = canvas_height/2;
@@ -261,6 +271,8 @@
              */
             void render_loading (Canvas & canvas);
 
+            void special_coin_event();
+
             /**
              * Dibuja la escena de juego cuando el estado de la escena es RUNNING.
              * @param canvas Referencia al Canvas con el que dibujar.
@@ -273,8 +285,27 @@
 
             void phantom_ia();
             void check_collision();
+            void create_map();
             void update_pacman();
             void button_config();
+
+
+            int mapa[265] = {
+                    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+                    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                    1,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,1,1,0,1,
+                    1,0,1,1,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1,
+                    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                    1,0,1,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,0,1,
+                    1,0,1,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,0,1,
+                    1,0,0,0,0,0,1,1,1,0,1,0,1,1,1,0,0,0,0,0,1,
+                    1,0,1,1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,1,0,1,
+                    1,0,1,1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,1,0,1,
+                    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+
+
+                };
 
         };
 

@@ -40,7 +40,8 @@ namespace example
         { ID(pacman),       "Character/pacman.png"        },
         { ID(phantom),       "Character/phantom.png"      },
         { ID(wall),                   "Character/wall.png"},
-        { ID(coin),                   "Character/pelota.png"},
+        { ID(coin),                 "Character/pelota.png"},
+        { ID(special_coin),   "Character/special_coin.png"},
 
     };
 
@@ -261,6 +262,7 @@ namespace example
 
     void Game_Scene::create_sprites ()
     {
+        create_map ();
         //prueba botones
 
         Graphics_Context::Accessor context = director.lock_graphics_context ();
@@ -299,6 +301,7 @@ namespace example
         Sprite_Handle  left_button_sprite(new Sprite( textures[ID(left)].get () ));
         Sprite_Handle  right_button_sprite(new Sprite( textures[ID(right)].get () ));
 
+
         Sprite_Handle pacman_sprite(new Sprite(textures[ID(pacman)].get()));
 
         Sprite_Handle phantom_sprite(new Sprite(textures[ID(phantom)].get()));
@@ -306,6 +309,12 @@ namespace example
         Sprite_Handle wall_sprite(new Sprite(textures[ID(wall)].get()));
 
         Sprite_Handle coin_sprite(new Sprite(textures[ID(coin)].get()));
+
+        Sprite_Handle special_coin_sprite(new Sprite(textures[ID(special_coin)].get()));
+
+
+
+
 
         sprites.push_back (up_button_sprite);
         sprites.push_back (down_button_sprite);
@@ -319,10 +328,15 @@ namespace example
         phantom_sprite->set_scale(0.1);
 
         sprites.push_back(wall_sprite);
-        wall_sprite->set_scale(0.1);
+        wall_sprite->set_scale(0.05);
 
         sprites.push_back(coin_sprite);
-        wall_sprite->set_scale(0.5);
+        coin_sprite->set_scale(0.5);
+
+        sprites.push_back(special_coin_sprite);
+        special_coin_sprite->set_scale(0.05);
+
+
 
         up_button_sprite->set_scale(0.2);
         down_button_sprite->set_scale(0.2);
@@ -344,6 +358,7 @@ namespace example
         phantom       = phantom_sprite.get();
         wall          = wall_sprite.get();
         coin          = coin_sprite.get();
+        special_coin  = special_coin_sprite.get();
 
         //prueba
         up_button = up_button_sprite.get();
@@ -364,8 +379,10 @@ namespace example
         left_button->set_position({(canvas_width/2)-100,canvas_height/6});
         right_button->set_position({(canvas_width/2)+100,canvas_height/6});
 
-
-
+        up_button->hide();
+        down_button->hide();
+        left_button->hide();
+        right_button->hide();
 
 
 
@@ -381,7 +398,11 @@ namespace example
         //posicion de la coin del que en el futuro haremos mas cositas
         coin->set_position({(canvas_width/2)-300,canvas_height/2});
 
+        special_coin->set_position({(canvas_width/2),canvas_height/3});
+
         follow_target = false;
+
+
 
         gameplay = WAITING_TO_START;
     }
@@ -426,8 +447,9 @@ namespace example
 
         // Se comprueban las posibles colisiones de la bola con los bordes y con los players:
 
-        //check_ball_collisions ();
         check_collision();
+        special_coin_event();
+
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -480,16 +502,9 @@ namespace example
         }
     }
     void Game_Scene::phantom_ia (){
-
-
-
         if(phantom->intersects(*wall)){
-
-
-
             if(phantom->intersects(*wall) && phantom->get_speed_y() !=0 )
             {
-
                 if(phantom->get_speed_y()<0)
                 {
                     phantom->set_position_y(phantom->get_position_y()+5.f);
@@ -558,9 +573,18 @@ namespace example
                 }
             }
         }
+    }
+
+    void Game_Scene::special_coin_event(){
+
+        if(pacman->intersects(*special_coin)){
+
+
+            if(pacman->intersects(*phantom));
 
 
 
+        }
 
 
 
@@ -748,6 +772,41 @@ namespace example
 
 
 
+    }
+    void Game_Scene::create_map ()
+    {
+        int f = 0;      // #fila
+        int c = 0;      // #columna
+        int i = 0;      // indice
+        int xLoc, yLoc; // Posiciones en X e Y
+        int x, y;       // Valores absolutos en X e Y
+        Id id = ID(wall);
+
+        for (; f <= 20; ++f, ++i) // Recorre la matriz fila a fila de izquierda a derecha
+        {
+
+            xLoc = f + 1; // Ajustar las posiciones para multiplicar con ellas
+            yLoc = c+ 1; //
+            x = posXTablero + xLoc * escalar;
+            y = posYTablero + yLoc * escalar;
+
+
+            // Genera la carta boca abajo y guarda una referencia a esta
+            if(mapa[i] ==1){
+                Sprite_Handle casillaMap(new Sprite(textures[id].get()));
+
+                casillaMap->set_position({x, y});
+                casillaMap->set_scale(0.05);
+                casillasSpr[i] = casillaMap.get();
+                sprites.push_back(casillaMap);
+            }
+
+            if (f == 20 && c < 12) // Salta a la siguiente fila siempre que haya una
+            {
+                f = -1;
+                ++c;
+            }
+        }
     }
 
 

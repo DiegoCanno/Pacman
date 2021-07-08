@@ -319,10 +319,10 @@ namespace example
         phantom_sprite->set_scale(0.1);
 
         sprites.push_back(wall_sprite);
-        wall_sprite->set_scale(0.05);
+        wall_sprite->set_scale(0.1);
 
         sprites.push_back(coin_sprite);
-        wall_sprite->set_scale(0.1);
+        wall_sprite->set_scale(0.5);
 
         up_button_sprite->set_scale(0.2);
         down_button_sprite->set_scale(0.2);
@@ -429,7 +429,7 @@ namespace example
 
         // Se comprueban las posibles colisiones de la bola con los bordes y con los players:
 
-        check_ball_collisions ();
+        //check_ball_collisions ();
         check_collision();
     }
 
@@ -542,35 +542,40 @@ namespace example
         }
         if(pacman->intersects(*coin)){
 
-
+            coin->set_scale(0);
 
 
 
         }
-        if(pacman->intersects(*wall)){
+        if(pacman->intersects(*wall) && pacman->get_speed_y() !=0 )
+        {
 
-            if(wall->get_position_x() == pacman->get_position_x()){
-
-                pacman->set_speed_x(0);
-
-
-            }
-            else if(wall->get_bottom_y()==pacman->get_top_y()){
-
+            if(pacman->get_speed_y()<0)
+            {
+                pacman->set_position_y(pacman->get_position_y()+5.f);
                 pacman->set_speed_y(0);
 
 
             }
-            else if(wall->get_right_x() == pacman->get_left_x()){
+            if( pacman->get_speed_y()>0)
+            {
+                pacman->set_position_y(pacman->get_position_y()-5.f);
+                pacman->set_speed_y(0);
 
+            }
+        }
+        else if(pacman->intersects(*wall) && pacman->get_speed_x()!=0){
+
+
+            if(pacman->get_speed_x()<0){
+                pacman->set_position_x(pacman->get_position_x()+5.f);
                 pacman->set_speed_x(0);
 
 
             }
-            else if(wall->get_top_y()==pacman->get_bottom_y()){
-
-                pacman->set_speed_y(0);
-
+            else if(pacman->get_speed_x()>0){
+                pacman->set_position_x(pacman->get_position_x()-5.f);
+                pacman->set_speed_x(0);
 
             }
 

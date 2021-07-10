@@ -8,9 +8,11 @@
  * angel.rodriguez@esne.edu
  */
 
+#include <basics/Director>
 #include "Game_Scene.hpp"
 #include "Sprite.hpp"
 #include <basics/log> // basics::log.d("message");
+#include "Menu_Scene.hpp"
 
 #include <cstdlib>
 #include <basics/Canvas>
@@ -29,16 +31,14 @@ namespace example
     Game_Scene::Texture_Data Game_Scene::textures_data[] =
     {
         { ID(loading),    "game-scene/loading.png"        },
-        { ID(hbar),       "game-scene/horizontal-bar.png" },
-        { ID(vbar),       "game-scene/vertical-bar.png"   },
-        { ID(player-bar), "game-scene/players-bar.png" },
         { ID(ball),       "game-scene/ball.png"           },
         { ID(up),       "button/arriba.png"               },
         { ID(down),       "button/abajo.png"              },
         { ID(left),       "button/izquierda.png"          },
         { ID(right),       "button/derecha.png"           },
         { ID(pacman),       "Character/pacman.png"        },
-        { ID(phantom),       "Character/phantom.png"      },
+        { ID(phantom),       "Character/phantom1.png"     },
+        { ID(phantomeat),       "Character/phantomeat.png"      },
         { ID(wall),                   "Character/wall.png"},
         { ID(coin),                 "Character/pelota.png"},
         { ID(special_coin),   "Character/special_coin.png"},
@@ -122,15 +122,10 @@ namespace example
                     final_y = *event[ID(y)].as< var::Float > ();
                     final_point = {final_x,final_y};
 
-
                 }
                 case ID(touch-moved):
                 {
 
-
-                    //user_target_y = *event[ID(y)].as< var::Float > ();
-                    //user_target_x = *event[ID(x)].as< var::Float > ();
-                   //follow_target = true;
                     break;
                 }
 
@@ -162,8 +157,6 @@ namespace example
                         pacman->set_speed_y(0);
                     }
 
-
-                    //follow_target = false;
                     break;
                 }
             }
@@ -179,6 +172,8 @@ namespace example
             case LOADING: load_textures  ();     break;
             case RUNNING: run_simulation (time); break;
             case ERROR:   break;
+
+
         }
 
 
@@ -214,6 +209,8 @@ namespace example
                     case ERROR:   break;
                 }
             }
+
+
         }
     }
 
@@ -263,37 +260,11 @@ namespace example
     void Game_Scene::create_sprites ()
     {
         create_map ();
-        //prueba botones
+
 
         Graphics_Context::Accessor context = director.lock_graphics_context ();
 
         // Se crean y configuran los sprites del fondo:
-
-        Sprite_Handle    top_bar(new Sprite( textures[ID(hbar)].get () ));
-        Sprite_Handle middle_bar(new Sprite( textures[ID(vbar)].get () ));
-        Sprite_Handle bottom_bar(new Sprite( textures[ID(hbar)].get () ));
-
-           top_bar->set_anchor   (TOP | LEFT);
-           top_bar->set_position ({ 0, canvas_height });
-        middle_bar->set_anchor   (CENTER);
-        middle_bar->set_position ({ canvas_width / 2.f, canvas_height / 2.f });
-        bottom_bar->set_anchor   (BOTTOM | LEFT);
-        bottom_bar->set_position ({ 0, 0 });
-
-        sprites.push_back (   top_bar);
-        sprites.push_back (middle_bar);
-        sprites.push_back (bottom_bar);
-
-        // Se crean los players y la bola:
-
-        Sprite_Handle  left_player_handle(new Sprite( textures[ID(player-bar)].get () ));
-        Sprite_Handle right_player_handle(new Sprite( textures[ID(player-bar)].get () ));
-        Sprite_Handle         ball_handle(new Sprite( textures[ID(ball)      ].get () ));
-
-
-        sprites.push_back ( left_player_handle);
-        sprites.push_back (right_player_handle);
-        sprites.push_back (        ball_handle);
 
         //Se crean los botones
         Sprite_Handle  up_button_sprite(new Sprite( textures[ID(up)].get () ));
@@ -301,7 +272,7 @@ namespace example
         Sprite_Handle  left_button_sprite(new Sprite( textures[ID(left)].get () ));
         Sprite_Handle  right_button_sprite(new Sprite( textures[ID(right)].get () ));
 
-
+        //se crean los sprites de los elementos del juego pacman, etc
         Sprite_Handle pacman_sprite(new Sprite(textures[ID(pacman)].get()));
 
         Sprite_Handle phantom_sprite(new Sprite(textures[ID(phantom)].get()));
@@ -312,8 +283,7 @@ namespace example
 
         Sprite_Handle special_coin_sprite(new Sprite(textures[ID(special_coin)].get()));
 
-
-
+        Sprite_Handle phantom_eat_sprite(new Sprite(textures[ID(phantom_eat)].get()));
 
 
         sprites.push_back (up_button_sprite);
@@ -336,6 +306,9 @@ namespace example
         sprites.push_back(special_coin_sprite);
         special_coin_sprite->set_scale(0.05);
 
+        sprites.push_back(phantom_eat_sprite);
+        phantom_eat_sprite->set_scale(0.1);
+
 
 
         up_button_sprite->set_scale(0.2);
@@ -347,18 +320,12 @@ namespace example
 
 
         // Se guardan punteros a los sprites que se van a usar frecuentemente:
-
-        top_border    =             top_bar.get ();
-        bottom_border =          bottom_bar.get ();
-        left_player   =  left_player_handle.get ();
-        right_player  = right_player_handle.get ();
-        ball          =         ball_handle.get ();
-
         pacman        = pacman_sprite.get();
         phantom       = phantom_sprite.get();
         wall          = wall_sprite.get();
         coin          = coin_sprite.get();
         special_coin  = special_coin_sprite.get();
+        phantom_eat   = phantom_eat_sprite.get();
 
         //prueba
         up_button = up_button_sprite.get();
@@ -368,39 +335,32 @@ namespace example
     }
 
     // ---------------------------------------------------------------------------------------------
-    // Juando el juego se inicia por primera vez o cuando se reinicia porque un jugador pierde, se
-    // llama a este método para restablecer la posición y velocidad de los sprites:
+
 
     void Game_Scene::restart_game()
     {
-        //prueba
+        //Posicion inicical al empezar el juego de los elementos del mismo
         up_button->set_position({canvas_width/2,canvas_height/3});
         down_button->set_position({canvas_width/2,canvas_height/6});
         left_button->set_position({(canvas_width/2)-100,canvas_height/6});
         right_button->set_position({(canvas_width/2)+100,canvas_height/6});
 
-        up_button->hide();
-        down_button->hide();
-        left_button->hide();
-        right_button->hide();
-
-
 
         //posicion del bueno de pacman
-        pacman->set_position({(canvas_width/2),canvas_height/2});
+        pacman->set_position({(canvas_width/2),(canvas_height/2)-100});
 
         //posicion phantom
         phantom->set_position({(canvas_width/2)+40,canvas_height/2});
 
         //posicion del wall del que en el futuro haremos mas cositas
-        wall->set_position({(canvas_width/2)+300,canvas_height/2});
+        //wall->set_position({(canvas_width/2)+300,canvas_height/2});
 
         //posicion de la coin del que en el futuro haremos mas cositas
-        coin->set_position({(canvas_width/2)-300,canvas_height/2});
+        //coin->set_position({(canvas_width/2)-300,canvas_height/2});
 
-        special_coin->set_position({(canvas_width/2),canvas_height/3});
+        special_coin->set_position({(canvas_width/2),canvas_height/4});
 
-        follow_target = false;
+
 
 
 
@@ -422,8 +382,9 @@ namespace example
         // Se hace unitario el vector y se multiplica un el valor de velocidad para que el vector
         // resultante tenga exactamente esa longitud:
 
-        ball->set_speed (random_direction.normalized () * ball_speed);
+        // se le da una velocidad inicial al fantasma a partir de ahi t
         phantom->set_speed_x(200);
+        phantom_eat->hide();
 
         gameplay = PLAYING;
     }
@@ -439,304 +400,164 @@ namespace example
             sprite->update (time);
         }
 
-        update_ai   ();
-        //update_user ();
 
-        //update_pacman();
         phantom_ia();
-
-        // Se comprueban las posibles colisiones de la bola con los bordes y con los players:
-
         check_collision();
         special_coin_event();
 
+
     }
 
     // ---------------------------------------------------------------------------------------------
-    // Usando un algoritmo sencillo se controla automáticamente el comportamiento del jugador
-    // izquierdo.
 
-    void Game_Scene::update_ai ()
-    {
-        if (left_player->intersects (*top_border))
-        {
-            // El player izquierdo ha tocado el borde superior, por lo que se debe quedar quieto:
 
-            left_player->set_position_y (top_border->get_bottom_y () - left_player->get_height () / 2.f);
-            left_player->set_speed_y (0.f);
-        }
-        else
-        if (left_player->intersects (*bottom_border))
-        {
-            // El player izquierdo ha tocado el borde inferior, por lo que se debe quedar quieto:
 
-            left_player->set_position_y (bottom_border->get_top_y () + left_player->get_height () / 2.f);
-            left_player->set_speed_y (0.f);
-        }
-        else
-        {
-            // Se determina si la bola está por encima o por debajo del centro del player izquierdo
-            // para establecer si debe subir o bajar:
-
-            float delta_y = ball->get_position_y () - left_player->get_position_y ();
-
-            if (ball->get_speed_y () < 0.f)
-            {
-                if (delta_y < 0.f)
-                {
-                    left_player->set_speed_y (-player_speed * (ball->get_speed_x () < 0.f ? 1.f : .5f));
-                }
-                else
-                    left_player->set_speed_y (0.f);
-            }
-            else
-            if (ball->get_speed_y () > 0.f)
-            {
-                if (delta_y > 0.f)
-                {
-                    left_player->set_speed_y (+player_speed * (ball->get_speed_x () < 0.f ? 1.f : .5f));
-                }
-                else
-                    left_player->set_speed_y (0.f);
-            }
-        }
-    }
     void Game_Scene::phantom_ia (){
-        if(phantom->intersects(*wall)){
-            if(phantom->intersects(*wall) && phantom->get_speed_y() !=0 )
-            {
-                if(phantom->get_speed_y()<0)
-                {
-                    phantom->set_position_y(phantom->get_position_y()+5.f);
-                    phantom->set_speed_y(0);
-                    RandomNumber = random() % 3+1;
+        for(int i=0;i<266;++i){
+            if(phantom->intersects(*walls[i])) {
+                if (phantom->intersects(*walls[i]) && phantom->get_speed_y() != 0) {
+                    if (phantom->get_speed_y() < 0) {
+                        phantom->set_position_y(phantom->get_position_y() + 5.f);
+                        phantom->set_speed_y(0);
+                        RandomNumber = random() % 3 + 1;
 
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(200);
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_x(-200);
+                        }
                     }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(200);
+                    if (phantom->get_speed_y() > 0) {
+                        phantom->set_position_y(phantom->get_position_y() - 5.f);
+                        RandomNumber = random() % 3 + 1;
+                        phantom->set_speed_y(0);
+
+
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(200);
+
+
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(-200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_x(-200);
+                        }
                     }
-                    else if (RandomNumber==3){
-                        phantom->set_speed_x(-200);
+                } else if (phantom->intersects(*walls[i]) && phantom->get_speed_x() != 0) {
+
+                    if (phantom->get_speed_x() < 0) {
+                        phantom->set_position_x(phantom->get_position_x() + 5.f);
+                        RandomNumber = random() % 3 + 1;
+                        phantom->set_speed_x(0);
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(-200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_y(200);
+                        }
+                    } else if (phantom->get_speed_x() > 0) {
+
+                        phantom->set_position_x(phantom->get_position_x() - 5.f);
+                        RandomNumber = random() % 3 + 1;
+                        phantom->set_speed_x(0);
+
+                        if (RandomNumber == 1) {
+                            phantom->set_speed_x(-200);
+                        } else if (RandomNumber == 2) {
+                            phantom->set_speed_y(-200);
+                        } else if (RandomNumber == 3) {
+                            phantom->set_speed_y(200);
+                        }
                     }
                 }
-                if( phantom->get_speed_y()>0)
-                {
-                    phantom->set_position_y(phantom->get_position_y()-5.f);
-                    RandomNumber = random() % 3+1;
-                    phantom->set_speed_y(0);
 
-
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(200);
-
-                    }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(-200);
-                    }
-
-                    }
-                
-                    else if(RandomNumber==3){
-                        phantom->set_speed_x(-200);
-                    }
-                }
-            }
-            else if(phantom->intersects(*wall) && phantom->get_speed_x()!=0){
-
-                if(phantom->get_speed_x()<0){
-                    phantom->set_position_x(phantom->get_position_x()+5.f);
-                    RandomNumber = random() % 3+1;
-                    phantom->set_speed_x(0);
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(200);
-                    }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(-200);
-                    }
-                    else if(RandomNumber==3){
-                        phantom->set_speed_y(200);
-                    }
-                }
-                else if(phantom->get_speed_x()>0){
-
-                    phantom->set_position_x(phantom->get_position_x()-5.f);
-                    RandomNumber = random() % 3+1;
-                    phantom->set_speed_x(0);
-
-                    if(RandomNumber==1){
-                        phantom->set_speed_x(-200);
-                    }
-                    else if(RandomNumber==2){
-                        phantom->set_speed_y(-200);
-                    }
-                    else if(RandomNumber==3){
-                        phantom->set_speed_y(200);
-                    }
-                }
             }
         }
+
+
     }
 
+    // maneja el que el fantasma  que se crea enseñe un sprite encima de el
+    //si se come al fantasma este vuelve a su posicion inicical y vuele a iniciar el movimento
     void Game_Scene::special_coin_event(){
 
         if(pacman->intersects(*special_coin)){
-
-
-            if(pacman->intersects(*phantom));
-
-
-
+            timer.reset();
+            puedecomer = true;
+            phantom_eat->is_visible();
         }
+        if(pacman->intersects(*phantom) && timer.get_elapsed_seconds () < 10.f && puedecomer) {
 
-
-
-
+            phantom_eat->hide();
+            phantom->set_position({(canvas_width/2)+40,canvas_height/2});
+            phantom->set_speed_y(200);
+        }
+        else if (timer.get_elapsed_seconds () > 10.f){
+            phantom_eat->hide();
+            puedecomer=false;
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
-    // Se hace que el player dechero se mueva hacia arriba o hacia abajo según el usuario esté
-    // tocando la pantalla por encima o por debajo de su centro. Cuando el usuario no toca la
-    // pantalla se deja al player quieto.
-
-    void Game_Scene::update_user ()
-    {
-        if (right_player->intersects (*top_border))
-        {
-            // Si el player está tocando el borde superior, no puede ascender:
-
-            right_player->set_position_y (top_border->get_bottom_y () - right_player->get_height () / 2.f);
-            right_player->set_speed_y (0);
-        }
-        else
-        if (right_player->intersects (*bottom_border))
-        {
-            // Si el player está tocando el borde inferior, no puede descender:
-
-            right_player->set_position_y (bottom_border->get_top_y () + right_player->get_height () / 2.f);
-            right_player->set_speed_y (0);
-        }
-        else
-        if (follow_target)
-        {
-            // Si el usuario está tocando la pantalla, se determina si está tocando por encima o por
-            // debajo de su centro para establecer si tiene que subir o bajar:
-
-            float delta_y = user_target_y - right_player->get_position_y ();
 
 
-            if (delta_y < 0.f) right_player->set_speed_y (-20); else
-            if (delta_y > 0.f) right_player->set_speed_y (20);
 
-
-            float delta_x = user_target_x + right_player->get_position_x ();
-
-            if (delta_x < 0.f) right_player->set_speed_x(-20); else
-            if (delta_x > 0.f) right_player->set_speed_x(+20);
-        }
-        else
-            right_player->set_speed_y (0);
-            right_player->set_speed_x (0);
-    }
 
 
     // ---------------------------------------------------------------------------------------------
+    //estas son las colisiones que tiene pacman tanto con el fantasma como con las monedas como con las paredes, no he encontrado la forma mas optima de hacerlo
+    //ya que esta recorriendo tres veces el array de 266
     void Game_Scene::check_collision() {
 
+        for(int i=0;i<266;++i){
+            if(pacman->intersects(*walls[i]) && pacman->get_speed_y() !=0 )
+            {
+                if(pacman->get_speed_y()<0)
+                {
+                    pacman->set_position_y(pacman->get_position_y()+5.f);
+                    pacman->set_speed_y(0);
+                }
+                if( pacman->get_speed_y()>0)
+                {
+                    pacman->set_position_y(pacman->get_position_y()-5.f);
+                    pacman->set_speed_y(0);
+                }
+            }
+            else if(pacman->intersects(*walls[i]) && pacman->get_speed_x()!=0){
+                if(pacman->get_speed_x()<0){
+                    pacman->set_position_x(pacman->get_position_x()+5.f);
+                    pacman->set_speed_x(0);
+                }
+                else if(pacman->get_speed_x()>0){
+                    pacman->set_position_x(pacman->get_position_x()-5.f);
+                    pacman->set_speed_x(0);
+                }
+            }
+
+        }
+        for(int i=0;i<266;++i){
+            if(pacman->intersects(*coins_a[i])){
+
+                contadorMonedas++;
+                coins_a[i]->set_position_y(4000);
+                if(contadorMonedas == 4){
+
+                    director.run_scene (shared_ptr< Scene >(new Menu_Scene));
+
+                }
+            }
+
+        }
         if(pacman->intersects(*phantom)){
-
-
-            pacman->set_position_x(canvas_width/2);
-            pacman->set_position_y(canvas_height/2);
-
-
+            director.run_scene (shared_ptr< Scene >(new Menu_Scene));
         }
-        if(pacman->intersects(*coin)){
-
-            coin->set_scale(0);
-
-
-
-        }
-        if(pacman->intersects(*wall) && pacman->get_speed_y() !=0 )
-        {
-            if(pacman->get_speed_y()<0)
-            {
-                pacman->set_position_y(pacman->get_position_y()+5.f);
-                pacman->set_speed_y(0);
-            }
-            if( pacman->get_speed_y()>0)
-            {
-                pacman->set_position_y(pacman->get_position_y()-5.f);
-                pacman->set_speed_y(0);
-            }
-        }
-        else if(pacman->intersects(*wall) && pacman->get_speed_x()!=0){
-            if(pacman->get_speed_x()<0){
-                pacman->set_position_x(pacman->get_position_x()+5.f);
-                pacman->set_speed_x(0);
-            }
-            else if(pacman->get_speed_x()>0){
-                pacman->set_position_x(pacman->get_position_x()-5.f);
-                pacman->set_speed_x(0);
-            }
-        }
-
 
 
     }
-    void Game_Scene::check_ball_collisions ()
-    {
-        // Se comprueba si la bola choca con el borde superior o con el inferior, en cuyo caso se
-        // ajusta su posición para que no lo atraviese y se invierte su velocidad en el eje Y:
 
-        if (ball->intersects (*top_border))
-        {
-            ball->set_position_y (top_border->get_bottom_y () - ball->get_height() / 2.f);
-            ball->set_speed_y    (-ball->get_speed_y ());
-        }
-
-        if (ball->intersects (*bottom_border))
-        {
-            ball->set_position_y (bottom_border->get_top_y () + ball->get_height() / 2.f);
-            ball->set_speed_y    (-ball->get_speed_y ());
-        }
-
-        // Solo si la bola no ha superado alguno de los players, se comprueba si choca con alguno
-        // de ellos, en cuyo caso se ajusta su posición para que no los atraviese y se invierte su
-        // velocidad en el eje X:
-
-        if (gameplay != BALL_LEAVING)
-        {
-            if (ball->get_left_x () < left_player->get_right_x ())
-            {
-                if (ball->get_bottom_y () < left_player->get_top_y () && ball->get_top_y () > left_player->get_bottom_y ())
-                {
-                    ball->set_position_x (left_player->get_right_x () + ball->get_width() / 2.f);
-                    ball->set_speed_x    (-ball->get_speed_x ());
-                }
-                else
-                    gameplay = BALL_LEAVING;
-            }
-
-            if (ball->get_right_x () > right_player->get_left_x ())
-            {
-                if (ball->get_bottom_y () < right_player->get_top_y () && ball->get_top_y () > right_player->get_bottom_y ())
-                {
-                    ball->set_position_x (right_player->get_left_x () - ball->get_width() / 2.f);
-                    ball->set_speed_x    (-ball->get_speed_x ());
-                }
-                else
-                    gameplay = BALL_LEAVING;
-            }
-        }
-        else
-        if (ball->get_right_x () < 0.f || ball->get_left_x () > float(canvas_width))
-        {
-            restart_game ();
-        }
-    }
 
     // ---------------------------------------------------------------------------------------------
 
@@ -763,20 +584,13 @@ namespace example
         for (auto & sprite : sprites)
         {
             sprite->render (canvas);
+
         }
+
+        phantom_eat->set_position(phantom->get_position());
     }
 
-    void Game_Scene::button_config()
-    {
 
-        options[UP].is_pressed = (ID(up));
-        options[DOWN].is_pressed = (ID(down));
-        options[LEFT].is_pressed = (ID(left));
-        options[RIGHT].is_pressed = (ID(right));
-
-
-
-    }
     void Game_Scene::create_map ()
     {
         int f = 0;      // #fila
@@ -785,6 +599,7 @@ namespace example
         int xLoc, yLoc; // Posiciones en X e Y
         int x, y;       // Valores absolutos en X e Y
         Id id = ID(wall);
+        Id idcoin = ID(coin);
 
         for (; f <= 20; ++f, ++i) // Recorre la matriz fila a fila de izquierda a derecha
         {
@@ -804,6 +619,17 @@ namespace example
                 casillasSpr[i] = casillaMap.get();
                 sprites.push_back(casillaMap);
             }
+            if (mapa[i]==2){
+
+                Sprite_Handle coin_sprite_v(new Sprite(textures[idcoin].get()));
+                coin_sprite_v->set_position({x, y});
+                coin_sprite_v->set_scale(0.01);
+                casillasCoins[i] = coin_sprite_v.get();
+                sprites.push_back(coin_sprite_v);
+
+
+            }
+
 
             if (f == 20 && c < 12) // Salta a la siguiente fila siempre que haya una
             {

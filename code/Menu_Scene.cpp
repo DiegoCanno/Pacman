@@ -149,8 +149,8 @@ namespace example
                         (
                             scale_then_translate_2d
                             (
-                                  option.is_pressed ? 0.75f : 1.f,              // Escala de la opción
-                                { option.position[0], option.position[1] }      // Traslación
+                                  option.is_pressed ? 0.75f : 1.f,
+                                { option.position[0], option.position[1] }
                             )
                         );
 

@@ -113,12 +113,8 @@
             Texture_Map    textures;                            ///< Mapa  en el que se guardan shared_ptr a las texturas cargadas.
             Sprite_List    sprites;                             ///< Lista en la que se guardan shared_ptr a los sprites creados.
 
-            Sprite       * top_border;                          ///< Puntero al sprite de la lista de sprites que representa el borde superior.
-            Sprite       * bottom_border;                       ///< Puntero al sprite de la lista de sprites que representa el borde inferior.
-            Sprite       * left_player;                         ///< Puntero al sprite de la lista de sprites que representa al jugador izquierdo.
-            Sprite       * right_player;                        ///< Puntero al sprite de la lista de sprites que representa al jugador derecho.
-            Sprite       * ball;                                ///< Puntero al sprite de la lista de sprites que representa a la bola.
-            Sprite       * pelota;
+
+
 
             //prueba
             Sprite       * up_button;
@@ -130,12 +126,22 @@
             Sprite       * wall;
             Sprite       * coin;
             Sprite       * special_coin;
+            Sprite       * phantom_eat;
 
             //printeo mapa
             unsigned            posXTablero = -25;         ///< Anchura para colocar en horizontal el tablero.
             const unsigned      posYTablero =  -15;         ///< Altura para colocar en vertical el tablero
             const unsigned      escalar     = 1216 * 0.05;         ///< Distancia entre casillas
-            Sprite              *casillasSpr[22*12];       ///< Guarda punteros a los sprites de las casillas
+            Sprite              *casillasSpr[22*12];
+            Sprite              *casillasCoins[22*12];///< Guarda punteros a los sprites de las casillas
+
+            Sprite   * walls[265];
+
+            Sprite   * coins_a[265];
+
+            int contadorMonedas = 0;
+
+            bool puedecomer;
 
             int  casillatrue;
             int RandomNumber;
@@ -151,15 +157,9 @@
             float final_x;
             float final_y;
 
-            //bool moving_right;
-            //bool moving_left;
-            //bool moving_up;
-            //bool moving_down;
 
 
-            bool           follow_target;                       ///< true si el usuario está tocando la pantalla y su player ir hacia donde toca.
-            float          user_target_y;                       ///< Coordenada Y hacia donde debe ir el player del usuario cuando este toca la pantalla.
-            float          user_target_x;
+
 
             Timer          timer;                               ///< Cronómetro usado para medir intervalos de tiempo
 
@@ -250,21 +250,6 @@
             void run_simulation (float time);
 
             /**
-             * Controla el player izquierdo usando una inteligencia artificial muy básica.
-             */
-            void update_ai ();
-
-            /**
-             * Hace que el player derecho se mueva hacia el punto de la pantalla que toca el usuario.
-             */
-            void update_user ();
-
-            /**
-             * Comprueba las colisiones de la bola con el escenario y con los players.
-             */
-            void check_ball_collisions ();
-
-            /**
              * Dibuja la textura con el mensaje de carga mientras el estado de la escena es LOADING.
              * La textura con el mensaje se carga la primera para mostrar el mensaje cuanto antes.
              * @param canvas Referencia al Canvas con el que dibujar la textura.
@@ -279,29 +264,24 @@
              */
             void render_playfield (Canvas & canvas);
 
-            //prueba
-            int Move_User(const Point2f & point);
-            int option_at (const Point2f & point);
+
 
             void phantom_ia();
             void check_collision();
             void create_map();
-            void update_pacman();
-            void button_config();
-
 
             int mapa[265] = {
                     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                     1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-                    1,0,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,1,1,0,1,
+                    1,0,1,1,0,0,1,1,1,0,1,0,1,1,1,2,0,1,1,0,1,
                     1,0,1,1,0,0,1,1,1,0,0,0,1,1,1,0,0,1,1,0,1,
                     1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
                     1,0,1,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,0,1,
-                    1,0,1,1,1,0,1,0,0,0,1,0,0,0,1,0,1,1,1,0,1,
+                    1,0,1,1,1,0,1,0,2,0,1,0,0,0,1,0,1,1,1,0,1,
                     1,0,0,0,0,0,1,1,1,0,1,0,1,1,1,0,0,0,0,0,1,
                     1,0,1,1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,1,0,1,
                     1,0,1,1,0,0,1,0,0,0,1,0,0,0,1,0,0,1,1,0,1,
-                    1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+                    1,0,0,2,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,1,
                     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 
 

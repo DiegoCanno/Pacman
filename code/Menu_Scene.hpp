@@ -69,7 +69,6 @@
             unsigned canvas_width;                              ///< Ancho de la resolución virtual usada para dibujar.
             unsigned canvas_height;                             ///< Alto  de la resolución virtual usada para dibujar.
 
-            Timer    timer;                                     ///< Cronómetro usado para medir intervalos de tiempo.
 
             Option   options[number_of_options];                ///< Datos de las opciones del menú
 

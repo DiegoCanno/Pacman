@@ -528,10 +528,17 @@ namespace example
 
                     if(RandomNumber==1){
                         phantom->set_speed_x(200);
+<<<<<<< HEAD
                     }
                     else if(RandomNumber==2){
                         phantom->set_speed_y(-200);
                     }
+=======
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+>>>>>>> parent of f9f3450 (Prueba)
                     else if(RandomNumber==3){
                         phantom->set_speed_x(-200);
                     }

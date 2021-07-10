@@ -10,8 +10,6 @@
 
 #include "Game_Scene.hpp"
 #include "Sprite.hpp"
-#include <basics/log> // basics::log.d("message");
-
 #include <cstdlib>
 #include <basics/Canvas>
 #include <basics/Director>
@@ -596,45 +594,7 @@ namespace example
     // tocando la pantalla por encima o por debajo de su centro. Cuando el usuario no toca la
     // pantalla se deja al player quieto.
 
-    void Game_Scene::update_user ()
-    {
-        if (right_player->intersects (*top_border))
-        {
-            // Si el player está tocando el borde superior, no puede ascender:
 
-            right_player->set_position_y (top_border->get_bottom_y () - right_player->get_height () / 2.f);
-            right_player->set_speed_y (0);
-        }
-        else
-        if (right_player->intersects (*bottom_border))
-        {
-            // Si el player está tocando el borde inferior, no puede descender:
-
-            right_player->set_position_y (bottom_border->get_top_y () + right_player->get_height () / 2.f);
-            right_player->set_speed_y (0);
-        }
-        else
-        if (follow_target)
-        {
-            // Si el usuario está tocando la pantalla, se determina si está tocando por encima o por
-            // debajo de su centro para establecer si tiene que subir o bajar:
-
-            float delta_y = user_target_y - right_player->get_position_y ();
-
-
-            if (delta_y < 0.f) right_player->set_speed_y (-20); else
-            if (delta_y > 0.f) right_player->set_speed_y (20);
-
-
-            float delta_x = user_target_x + right_player->get_position_x ();
-
-            if (delta_x < 0.f) right_player->set_speed_x(-20); else
-            if (delta_x > 0.f) right_player->set_speed_x(+20);
-        }
-        else
-            right_player->set_speed_y (0);
-            right_player->set_speed_x (0);
-    }
 
 
     // ---------------------------------------------------------------------------------------------
@@ -782,7 +742,7 @@ namespace example
         int x, y;       // Valores absolutos en X e Y
         Id id = ID(wall);
 
-        for (; f <= 20; ++f, ++i) // Recorre la matriz fila a fila de izquierda a derecha
+        for (; f <= 20; ++f, ++i) //recorre filas de izquierda a derecha
         {
 
             xLoc = f + 1; // Ajustar las posiciones para multiplicar con ellas
@@ -791,7 +751,7 @@ namespace example
             y = posYTablero + yLoc * escalar;
 
 
-            // Genera la carta boca abajo y guarda una referencia a esta
+
             if(mapa[i] ==1){
                 Sprite_Handle casillaMap(new Sprite(textures[id].get()));
 
@@ -801,7 +761,7 @@ namespace example
                 sprites.push_back(casillaMap);
             }
 
-            if (f == 20 && c < 12) // Salta a la siguiente fila siempre que haya una
+            if (f == 20 && c < 12) //salta a la siguiente fila 
             {
                 f = -1;
                 ++c;

@@ -524,6 +524,8 @@ namespace example
                     phantom->set_position_y(phantom->get_position_y()-5.f);
                     RandomNumber = random() % 3+1;
                     phantom->set_speed_y(0);
+
+
                     if(RandomNumber==1){
                         phantom->set_speed_x(200);
 
@@ -532,6 +534,25 @@ namespace example
                         phantom->set_speed_y(-200);
                     }
 
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
+
+                    }
+                    else if(RandomNumber==2){
+                        phantom->set_speed_y(-200);
+                    }
 
                     else if(RandomNumber==3){
                         phantom->set_speed_x(-200);
